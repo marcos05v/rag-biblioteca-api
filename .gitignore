@@ -3,3 +3,5 @@ rag/
 __pycache__/
 tempCodeRunnerFile.py
 .DS_Store
+uploads/
+app/prueba_*.py
