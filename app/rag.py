@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import psycopg
 import os
 from google import genai
+from . import pdf
 
 #Bloque 1: conexopnes y cosas que se carguen 1 vez
 
@@ -21,7 +22,7 @@ DATADB = "host=localhost port=5432 dbname=rag user=rag password=rag"
 
 # Bloque 2: funciones
 
-def trocear(texto, tamano=10, solape=3):
+def trocear(texto, tamano=80, solape=20):
     palabras = texto.split()
     chunks = []
     i = 0
@@ -37,12 +38,14 @@ def a_pgvector(vector):
 
 #Bloque 3
 
+
+
 def indexar(documento,texto):
     chunkTexto = trocear(texto)
-    nombreDocumento = documento+'.txt'
 
     with psycopg.connect(DATADB) as conexion:
         with conexion.cursor() as cur:
+            cur.execute("DELETE FROM chunks WHERE documento = %s", (documento,))
             for contenido in chunkTexto:
                 vector = modelo.encode(contenido)
                 cur.execute(
@@ -51,6 +54,12 @@ def indexar(documento,texto):
                 )
         conexion.commit()
     return f'se guardaron {len(chunkTexto)} chunks'
+
+#Uso de leer pdf del archivo pdf.py para que se comunique con indexar pdf
+
+def indexar_pdf(documento,ruta):
+    texto = pdf.leer_pdf(ruta)
+    return indexar(documento, texto)
 
 def recuperar(pregunta, k=5):
     vector = modelo.encode(pregunta)
