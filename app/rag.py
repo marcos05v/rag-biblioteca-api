@@ -61,7 +61,17 @@ def indexar_pdf(documento,ruta):
     texto = pdf.leer_pdf(ruta)
     return indexar(documento, texto)
 
-def recuperar(pregunta, k=5):
+def borrar_documento(documento):
+    with psycopg.connect(DATADB) as conexion:
+        with conexion.cursor() as cur:
+            cur.execute(
+                'DELETE FROM chunks WHERE documento = %s',(documento,)
+            )
+            borrados = cur.rowcount
+        conexion.commit()
+    return borrados
+
+def recuperar(pregunta, k=10):
     vector = modelo.encode(pregunta)
 
     with psycopg.connect(DATADB) as conexion:
