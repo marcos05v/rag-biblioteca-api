@@ -40,3 +40,7 @@ def borrar(documento: str):
     if borrados == 0:
         raise HTTPException(status_code=404, detail='No existe este documento')
     return {"mensaje": f"se borraron {borrados} chunks del documento {documento}"}
+
+@app.get('/documentos')
+def listar():
+    return {'documentos': rag.listar_documentos()}

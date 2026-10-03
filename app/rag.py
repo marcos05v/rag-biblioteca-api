@@ -71,6 +71,15 @@ def borrar_documento(documento):
         conexion.commit()
     return borrados
 
+def listar_documentos():
+    with psycopg.connect(DATADB) as conexion:
+        with conexion.cursor() as cur:
+            cur.execute(
+                'SELECT DISTINCT documento FROM chunks'
+            )
+            filas = cur.fetchall()
+    return [fila[0] for fila in filas]
+
 def recuperar(pregunta, k=10):
     vector = modelo.encode(pregunta)
 
